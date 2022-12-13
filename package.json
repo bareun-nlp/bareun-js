@@ -1,0 +1,25 @@
+{
+  "name": "baikalnlp",
+  "version": "1.0.0",
+  "description": "Javascript client for baikal nlp",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baikalai/baikalnlp-js.git"
+  },
+  "keywords": [
+    "baikal",
+    "nlp",
+    "client",
+    "tokenizer"
+  ],
+  "author": "BAIKAL AI, Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/baikalai/baikalnlp-js/issues"
+  },
+  "homepage": "https://baikal.ai"
+}
