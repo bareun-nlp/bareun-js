@@ -9,15 +9,8 @@ var Empty = null;
 class ClientBase {
     client;
     proto = null;
-    constructor(protofile, service, remote) {
-        if( remote == null ) {
-            remote = conf.default.nlp_host + ":" + conf.default.nlp_port;
-        }
-        if( remote.indexOf(":") < 0 ) 
-            remote += ":" + conf.default.nlp_port;
-        
-        this.remote = remote;
 
+    static getProto(protofile) {
         let packageDefinition = protoLoader.loadSync(
             protofile,
             {
@@ -30,7 +23,33 @@ class ClientBase {
               });
 
 
-        this.proto = grpc.loadPackageDefinition(packageDefinition).bareun;
+        let proto = grpc.loadPackageDefinition(packageDefinition).bareun;
+        return proto;
+    }
+
+    constructor(protofile, service, remote) {
+        if( remote == null ) {
+            remote = conf.default.nlp_host + ":" + conf.default.nlp_port;
+        }
+        if( remote.indexOf(":") < 0 ) 
+            remote += ":" + conf.default.nlp_port;
+        
+        this.remote = remote;
+
+        // let packageDefinition = protoLoader.loadSync(
+        //     protofile,
+        //     {
+        //         keepCase: true,
+        //         longs: String,
+        //         enums: String,
+        //         defaults: true,
+        //         oneofs: true,
+        //         includeDirs: conf.protos.includeDirs
+        //       });
+
+
+        this.proto = ClientBase.getProto(protofile) ;
+        // grpc.loadPackageDefinition(packageDefinition).bareun;
 
         this.client = new this.proto[service](
             this.remote,
