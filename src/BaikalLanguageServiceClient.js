@@ -27,27 +27,45 @@ class BaikalLanguageServiceClient extends ClientBase {
         return analyzeSyntaxRequest;
     }
 
-    AnalyzeSyntax ( text, domain = null, auto_split = false ) {        
+    AnalyzeSyntax ( text, domain = null, auto_split = false, callback = null ) {
+        if( typeof domain === "function" ) {
+            callback = domain;
+            domain = null;
+        } else if( typeof auto_split  === "function" ) {
+            callback = auto_split;
+            auto_split = false;
+        }
+        if( !callback ) {
+            throw new Error("callback is null.");
+        }
         let pThis = this;
         this.client.AnalyzeSyntax(this._newRequest(text, domain, auto_split),
             (error, analyzeSyntaxResponse) => {
-                pThis.proc_response(error, analyzeSyntaxResponse);
+                callback(error, analyzeSyntaxResponse);
             });
         return this;
     }
 
     async asyncAnalyzeSyntax(text, domain = null, auto_split = false ) {
         let promise = new Promise( (resolve, reject) => {
-                this.client.AnalyzeSyntax(this._newRequest(text, domain, auto_split),
-                    (error, analyzeSyntaxResponse) => resolve([error, analyzeSyntaxResponse]))
+                this.client.AnalyzeSyntax(
+                    this._newRequest(text, domain, auto_split),
+                    (error, analyzeSyntaxResponse) => {
+                        if( error ) {
+                            reject(error);
+                            return;
+                        }
+                        resolve(analyzeSyntaxResponse)
+                    })                    
             }
         );
-        return await promise;
+        return promise;
+    }
+
+    static emptyAnalyzeSyntaxResponse = () =>  {
+        sentences : []
     }
 }
 
-BaikalLanguageServiceClient.emptyAnalyzeSyntaxResponse = () =>  {
-    sentences : []
-}
 
 module.exports = BaikalLanguageServiceClient;

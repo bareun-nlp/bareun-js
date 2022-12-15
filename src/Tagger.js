@@ -52,16 +52,16 @@ class Tagged {
     pos(flatten = true, join = false, detail = false) {
         let ret = new Array();
         if ( flatten )
-            for( s of this.r.sentences )
-                for( token of s.tokens )
-                    for ( m of token.morphemes )
+            for( const s of this.r.sentences )
+                for( const token of s.tokens )
+                    for ( const m of token.morphemes )
                         ret.push( Tagged._pos(m, join, detail) ) ;
         else
-            for( s of this.r.sentences )
-                for( token of s.tokens ) {
+            for( const s of this.r.sentences )
+                for( const token of s.tokens ) {
                     let t = new Array();                    
                     ret.push(t);
-                    for ( m of token.morphemes )
+                    for ( const m of token.morphemes )
                         t.push( Tagged._pos(m, join, detail) ) ;
                 }
         return ret;
@@ -69,10 +69,10 @@ class Tagged {
 
     _get_list( item, filter = null ) {
         let ret = new Array();
-        for( s of this.r.sentences )
-                for( token of s.tokens )
-                    for ( m of token.morphemes )
-                        if( filter && filter(m) )
+        for( const s of this.r.sentences )
+                for( const token of s.tokens )
+                    for ( const m of token.morphemes )
+                        if( filter===null || filter(m) )
                             ret.push( item ? item(m) : m );
         
         return ret;
@@ -127,7 +127,7 @@ class Tagger {
 
     async tag(phrase, auto_split = false) {
         if( !phrase )
-            return BaikalLanguageServiceClient.emptyAnalyzeSyntaxResponse();        
+            return new Tagged( "", BaikalLanguageServiceClient.emptyAnalyzeSyntaxResponse());        
         
         if( Array.isArray(phrase) ) {
             phrase = phrase.join("\n");
@@ -148,6 +148,20 @@ class Tagger {
     }
 
     async pos(phrase, flatten = true, join=false, detail=false) {
-        
+        return this.tag(phrase, flatten, join, detail).pos();
+    }
+
+    async morphs(phrase) {
+        return this.tag(phrase).morphs();
+    }
+
+    async nouns(phrase) {
+        return this.tag(phrase).nouns();
+    }
+
+    async verbs(phrase) {
+        return this.tag(phrase).verbs();
     }
 }
+
+module.exports = Tagger;
