@@ -2,7 +2,7 @@
   "name": "baikalnlp",
   "version": "1.0.0",
   "description": "Javascript client for baikal nlp",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest"
   },
