@@ -18,10 +18,14 @@ function build_dict_set(domain, name, dict_set) {
         for( const v of dict_set )
             ret.items[v] = 1;
     } else {
-        for( const v of dict_set.keys() )
+        for( const v of Object.keys(dict_set) )
             ret.items[v] = 1;
     }
     return ret;
+}
+
+function isNull(v) {
+    return (v === undefined || v === null) ? true : false;
 }
 
 class CustomDictionaryServiceClient extends ClientBase {    
@@ -29,11 +33,12 @@ class CustomDictionaryServiceClient extends ClientBase {
         super(proto_file, "CustomDictionaryService", remote );
     }
 
-
+    static common_proto = common;
+    static build_dict_set = build_dict_set;
 
     get_list(callback) {
         this.client.GetCustomDictionaryList({}
-            , (err, res) => callback(err, res!==null?res.domain_dicts:res));
+            , (err, res) => callback(err, !isNull(res)?res.domain_dicts:res));
         return this;
     }
 
@@ -54,11 +59,11 @@ class CustomDictionaryServiceClient extends ClientBase {
 
     get(domain, callback) {
         this.client.GetCustomDictionary({domain_name:domain}
-            , (err, res) => callback(err, res!==null?res.dict:res));
+            , (err, res) => callback(err, !isNull(res)?res.dict:res));
         return this;
     }
 
-    async async_get_list(domain) {
+    async async_get(domain) {
         return new Promise( 
             (resolve, reject) => {
                 this.get(domain
@@ -73,24 +78,23 @@ class CustomDictionaryServiceClient extends ClientBase {
         );
     }
 
-    update(domain, np, cp, cp_caret, callback) {
-        this.client.GetCustomDictionary({
+    update(domain, word_sets, callback) {
+        let dict = {domain_name : domain};
+        for( const name of Object.keys(word_sets) ) {
+            dict[name] = build_dict_set(domain, name.replace("_", "-"), word_sets[name]);
+        }
+        this.client.UpdateCustomDictionary({
                 domain_name:domain,
-                dict : {
-                    domain_name : domain,
-                    np_set : build_dict_set(domain, 'np-set', np),
-                    cp_set : build_dict_set(domain, 'cp-set', cp),
-                    cp_caret_set : build_dict_set(domain, 'cp-caret-set', cp_caret)
-                }
+                dict : dict
             },
-            (err, res) => callback(err, res!==null?(res.updated_domain_name == domain):false));
+            (err, res) => callback(err, !isNull(res)?(res.updated_domain_name == domain):false));
         return this;
     } 
 
-    async async_update(domain, np, cp, cp_caret) {
+    async async_update(domain, word_sets) {
         return new Promise( 
             (resolve, reject) => {
-                this.update(domain, np, cp, cp_caret
+                this.update(domain, word_sets
                     , (err, res) => {
                         if( err ) {
                             reject(err);
@@ -104,7 +108,7 @@ class CustomDictionaryServiceClient extends ClientBase {
 
     remove_all(callback) {
         this.client.RemoveCustomDictionaries({ all : true }
-            , (err, res) => callback(err, res!==null?res.deleted_domain_names.keys():res));
+            , (err, res) => callback(err, !isNull(res)?Object.keys(res.deleted_domain_names):res));
         return this;
     }
 
@@ -124,14 +128,16 @@ class CustomDictionaryServiceClient extends ClientBase {
     }
 
     remove(domains, callback) {
+        if( typeof domains === "string" )
+            domains = [domains];
         this.client.RemoveCustomDictionaries({ domain_names : domains, all : false }
-            , (err, res) => callback(err, res!==null?res.deleted_domain_names.keys():res));
+            , (err, res) => callback(err, !isNull(res)?Object.keys(res.deleted_domain_names):res));
         return this;
     }
-    async async_remove() {
+    async async_remove(domains) {
         return new Promise( 
             (resolve, reject) => {
-                this.remove(
+                this.remove(domains,
                     (err, res) => {
                         if( err ) {
                             reject(err);
