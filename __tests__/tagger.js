@@ -1,5 +1,4 @@
-const { addCommonProtos } = require("@grpc/proto-loader/build/src/util");
-
+const path = require("path");
 const SRC_DIR="../src/";
 
 let Client = require(SRC_DIR+"BaikalLanguageServiceClient.js");
@@ -59,3 +58,5 @@ test("Tagged morphs()", async () => {
     console.log("verbs()"+JSON.stringify(obj));
 
 });
+
+

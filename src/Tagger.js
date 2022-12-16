@@ -19,7 +19,7 @@ class Tagged {
     as_json() { return this.r; }
 
     as_json_str(beauty  = false) {
-        return JSON.stringify(this.r, null, beauty ? '  ' : null);
+        return JSON.stringify(this.r, null, beauty ? 2 : null);
     }
 
     print_as_json(out = console) {
