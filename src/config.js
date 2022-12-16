@@ -16,7 +16,7 @@ var protoLoader = require("@grpc/proto-loader");
 
 const ROOT_PATH = path.join(__dirname, '..'); 
 const PROTOS_PATH = path.join(ROOT_PATH, 'protos'); 
-const GOOGLE_PROTOS = path.join(ROOT_PATH, 'node_modules/google-proto-files'); 
+const GOOGLE_PROTOS = require('google-proto-files').getProtoPath(".."); 
 const PROTO_PACKAGE = "bareun";
 
 module.exports = {
