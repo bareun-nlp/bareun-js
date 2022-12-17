@@ -1,6 +1,6 @@
 {
   "name": "baikalnlp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Javascript client for baikal nlp",
   "main": "src/index.js",
   "scripts": {
