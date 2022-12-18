@@ -16,16 +16,24 @@ class CustomDict {
 
     constructor(domain, host=conf.default.nlp_host, port=conf.default.nlp_port) {
         this.opts = {domain:domain};
-        if( host.indexOf(":") >= 0 ) {
+        if( host instanceof CustomDictionaryServiceClient ) {
+            this.client = host;
+            host = this.client.remote;
             let arr = host.split(":");
             this.opts.host = arr[0];
             this.opts.port = parseInt(arr[1]);
+        } else {
+            if( host.indexOf(":") >= 0 ) {
+                let arr = host.split(":");
+                this.opts.host = arr[0];
+                this.opts.port = parseInt(arr[1]);
+            }
+            else {
+                this.opts.host = host;
+                this.opts.port = port;
+            }
+            this.client = new CustomDictionaryServiceClient(this.opts.host + ":" + this.opts.port);
         }
-        else {
-            this.opts.host = host;
-            this.opts.port = port;
-        }
-        this.client = new CustomDictionaryServiceClient(this.opts.host + ":" + this.opts.port);
     }
 
     static async read_dic_file(fn) {

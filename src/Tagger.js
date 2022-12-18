@@ -1,6 +1,6 @@
 const conf = require("./config.js");
 const BaikalLanguageServiceClient = require("./BaikalLanguageServiceClient.js");
-
+const CustomDictionaryServiceClient = require("./CustomDictionaryServiceClient.js");
 
 class Tagged {
     constructor(phrase, res) {
@@ -97,9 +97,10 @@ class Tagged {
 class Tagger {
     opts;
     client;
+    dict_client = null;
     custom_dicts = {};
     constructor(host=conf.default.nlp_host, port=conf.default.nlp_port, domain=null) {
-        if( typeof host !== "object" ) {
+        if( typeof host === "string" || host instanceof String ) {
             this.opts = {};
             if( host.indexOf(":") >= 0 ) {
                 let arr = host.split(":");
@@ -123,7 +124,20 @@ class Tagger {
         return this;
     }
 
-    // TODO custom_dict()
+    getDictClient() {
+        if( !this.dict_client ) 
+            this.dict_client = new CustomDictionaryServiceClient(this.opts.host + ":" + this.opts.port);
+        
+        return this.dict_client;
+    }
+
+    custom_dict(domain) {
+        if( domain == null || domain == "" ) 
+            throw new Error("invalid domain name for custom dict");
+        
+        return this.custom_dicts[domain] || 
+            (this.custom_dicts[domain] = new CustomDict(domain, this.getDictClient())); 
+    }
 
     async tag(phrase, auto_split = false) {
         if( !phrase )
@@ -132,7 +146,7 @@ class Tagger {
         if( Array.isArray(phrase) ) {
             phrase = phrase.join("\n");
         }
-        return new Tagged(phrase, await this.client.asyncAnalyzeSyntax(phrase, this.domain, auto_split) )
+        return new Tagged(phrase, await this.client.asyncAnalyzeSyntax(phrase, this.opts.domain, auto_split) )
     }
 
     async tags(...phrases) {
