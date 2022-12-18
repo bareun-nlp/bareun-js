@@ -17,7 +17,7 @@
     "tokenizer"
   ],
   "author": "BAIKAL AI, Inc.",
-  "license": "ISC",
+  "license": "BSD 3-Clause",
   "bugs": {
     "url": "https://github.com/baikalai/baikalnlp-js/issues"
   },

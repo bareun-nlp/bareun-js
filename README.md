@@ -1,6 +1,12 @@
 # baikalnlp [![Build Status](https://travis-ci.org/baikalai/baikalnlp-js.png?branch=master)](https://travis-ci.org/baikalai/baikalnlp-js)
 
-Javascript client for baikal nlp
+# What is this?
+
+`baikalnlpy` is the javascript library for baikal NLP.
+
+Baikal NLP is a Korean NLP,
+which provides tokenizing, POS tagging for Korean.
+
 
 ## Installation
 
@@ -15,27 +21,17 @@ command line tools.
 npm install baikalnlp --save
 ```
 
-## Tests
-
-```sh
-npm install
-npm test
-```
-```
-
-> baikalnlp@1.0.0 test
-> test
-
+## How to get baikal NLP
+- Go to https://license.baikal.ai/.
+  - With registration, for the first time, you can get a free license for 3 months.
+  - If you are a student or a researcher, you can get also a free license for 1 year,
+    which is able to renew after 1 year.
+- Or use docker image.
+```shell
+docker pull baikalai/baikal-nlp:v1.7.3
 ```
 
-## Dependencies
-
-None
-
-## Dev Dependencies
-
-None
 
 ## License
 
-ISC
+BSD 3-Clause License
