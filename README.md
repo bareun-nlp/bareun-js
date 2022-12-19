@@ -1,8 +1,8 @@
-# baikalnlp [![Build Status](https://travis-ci.org/baikalai/baikalnlp-js.png?branch=master)](https://travis-ci.org/baikalai/baikalnlp-js)
+# baikalnlp 
 
 # What is this?
 
-`baikalnlpy` is the javascript library for baikal NLP.
+`baikalnlp` is the javascript library for baikal NLP.
 
 Baikal NLP is a Korean NLP,
 which provides tokenizing, POS tagging for Korean.

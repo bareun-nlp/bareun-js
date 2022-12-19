@@ -1,7 +1,7 @@
 {
   "name": "baikalnlp",
-  "version": "1.0.1",
-  "description": "Javascript client for baikal nlp",
+  "version": "1.0.2",
+  "description": "Javascript client for bareun",
   "main": "src/index.js",
   "scripts": {
     "test": "jest"
@@ -16,12 +16,16 @@
     "client",
     "tokenizer"
   ],
-  "author": "BAIKAL AI, Inc.",
+  "author":  {
+    "name": "Gihyun YUN",
+    "email": "gih2yun@baikal.ai", 
+    "homepage": "https://bareun.ai"
+ },
   "license": "BSD 3-Clause",
   "bugs": {
     "url": "https://github.com/baikalai/baikalnlp-js/issues"
   },
-  "homepage": "https://baikal.ai",
+  "homepage": "https://bareun.ai",
   "devDependencies": {
     "jest": "^29.3.1"
   },
