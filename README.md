@@ -31,6 +31,60 @@ npm install bareun --save
 docker pull bareunai/bareun:latest
 ```
 
+## classes 
+
+### class LanguageServiceClient
+#### Methods
+##### constructor(remote=null) 
+###### Parameters: 
+- remote : <String>. host + ":" + port. ex)"nlp.baikal.ai:5656"
+
+##### AnalyzeSyntax( text, domain = null, auto_split = false, callback = null )
+Analyze text.
+###### Parameters:
+- text : <String>. 
+- domain : <String>. domain custom dictionary name.
+- auto split : <Boolean>.
+- callback : Function(error, response). 
+
+#### <async> asyncAnalyzeSyntax(text, domain = null, auto_split = false )
+Analyze text.
+###### Parameters:
+- text : <String>. 
+- domain : <String>. domain custom dict name.
+- auto split : <Boolean>.
+
+
+### class Tagger
+#### Methods
+##### constructor(host="nlp.baikal.ai", port=5656, domain=null)
+###### Parameters:
+- host : <String>. NLP server address.
+- port : <Integer>. NLP server port.
+- domain : <String>. domain custom dictionary name.
+
+##### set_domain(domain)
+Set current domain custom dictionary name.
+###### Parameters:
+- domain : <String>. domain custom dictionary name.
+
+##### custom_dict(domain)
+Get custom dictionary 
+###### Parameters:
+- domain : <String>. domain custom dictionary name.
+###### Returns:
+Object<CustomDict>. Custom dictionary object.
+
+#### async tag(phrase, auto_split = false)
+###### Parameters:
+- phrase : <String>. 
+- auto_split : <Boolean>.
+###### Returns:
+Object<Tagged>. Tagged object.
+
+
+
+
 ## How to use
 ```
     let host="gpu2.baikal.ai"
