@@ -81,6 +81,14 @@ class CustomDict {
         this.word_sets.cp_set = await CustomDict.read_dic_file(fn);
         return this;
     }
+    async read_vv_set_from_file(fn) {
+        this.word_sets.vv_set = await CustomDict.read_dic_file(fn);
+        return this;
+    }
+    async read_va_set_from_file(fn) {
+        this.word_sets.va_set = await CustomDict.read_dic_file(fn);
+        return this;
+    }
     async read_cp_caret_set_from_file(fn) {
         this.word_sets.cp_caret_set = await CustomDict.read_dic_file(fn);
         return this;
@@ -102,7 +110,14 @@ class CustomDict {
         this.word_sets.cp_caret_set = dict_set;
         return this;
     }
-
+    copy_vv_set(dict_set) {
+        this.word_sets.vv_set = dict_set;
+        return this;
+    }
+    copy_va_set(dict_set) {
+        this.word_sets.va_set = dict_set;
+        return this;
+    }
     copy_set(set_name, dict_set) {
         this.word_sets[set_name] = dict_set;
         return this;
