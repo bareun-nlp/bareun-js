@@ -6,7 +6,7 @@ var lanaguage_service_proto = 'language_service.proto';
 var grpc = require('@grpc/grpc-js');
 var protoLoader = require('@grpc/proto-loader');
 
-class BaikalLanguageServiceClient extends ClientBase {    
+class LanguageServiceClient extends ClientBase {    
     constructor(remote = null) {
         super(lanaguage_service_proto, "LanguageService", remote );
     }
@@ -68,4 +68,4 @@ class BaikalLanguageServiceClient extends ClientBase {
 }
 
 
-module.exports = BaikalLanguageServiceClient;
+module.exports = LanguageServiceClient;

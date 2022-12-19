@@ -1,5 +1,5 @@
 const conf = require("./config.js");
-const BaikalLanguageServiceClient = require("./BaikalLanguageServiceClient.js");
+const LanguageServiceClient = require("./LanguageServiceClient.js");
 const CustomDictionaryServiceClient = require("./CustomDictionaryServiceClient.js");
 
 class Tagged {
@@ -115,7 +115,7 @@ class Tagger {
         } else {
             this.opts = host;
         }
-        this.client = new BaikalLanguageServiceClient(this.opts.host + ":" + this.opts.port);
+        this.client = new LanguageServiceClient(this.opts.host + ":" + this.opts.port);
 
     }
 
@@ -141,7 +141,7 @@ class Tagger {
 
     async tag(phrase, auto_split = false) {
         if( !phrase )
-            return new Tagged( "", BaikalLanguageServiceClient.emptyAnalyzeSyntaxResponse());        
+            return new Tagged( "", LanguageServiceClient.emptyAnalyzeSyntaxResponse());        
         
         if( Array.isArray(phrase) ) {
             phrase = phrase.join("\n");

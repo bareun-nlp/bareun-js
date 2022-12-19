@@ -1,7 +1,7 @@
 const path = require("path");
 const SRC_DIR="../src/";
 
-let Client = require(SRC_DIR+"BaikalLanguageServiceClient.js");
+let Client = require(SRC_DIR+"LanguageServiceClient.js");
 let Tagger = require(SRC_DIR+"Tagger.js");
 const conf = require(SRC_DIR+"config.js");
 

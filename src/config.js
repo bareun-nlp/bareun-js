@@ -4,8 +4,8 @@ require("dotenv").config();
 .env 파일이 우선적으로 적용됨.
 .env 구조
 
-BAIKAL_NLP_HOST="localhost"
-BAIKAL_NLP_PORT=5656
+BAREUN_HOST="localhost"
+BAREUN_PORT=5656
 
 */
 
@@ -21,8 +21,8 @@ const PROTO_PACKAGE = "bareun";
 
 module.exports = {
     default : {
-        nlp_host : process.env.BAIKAL_NLP_HOST || "nlp.baikal.ai",
-        nlp_port : process.env.BAIKAL_NLP_PORT || 5656
+        nlp_host : process.env.BAREUN_HOST || "nlp.baikal.ai",
+        nlp_port : process.env.BAREUN_PORT || 5656
     },
     ROOT_PATH : ROOT_PATH,
     protos : {

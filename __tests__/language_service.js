@@ -1,13 +1,13 @@
 
 const SRC_DIR="../src/";
 
-let BaikalLanguageServiceClient = require(SRC_DIR+"BaikalLanguageServiceClient.js");
-let language_service_client = new BaikalLanguageServiceClient();
+let LanguageServiceClient = require(SRC_DIR+"LanguageServiceClient.js");
+let language_service_client = new LanguageServiceClient();
 const conf = require(SRC_DIR+"config.js");
 jest.setTimeout(30000);
 console.log(">>>>>>> "+ language_service_client.remote + " test start.");
 
-test("callback request for BaikalLanguageServiceClient", 
+test("callback request for LanguageServiceClient", 
     (done) => {
     
         language_service_client.AnalyzeSyntax("아버지가 방에 들어가신다.",
@@ -30,7 +30,7 @@ test("callback request for BaikalLanguageServiceClient",
 
 
 
-test("async request for BaikalLanguageServiceClient", 
+test("async request for LanguageServiceClient", 
   async () => {
     expect.assertions(1);
     try {  

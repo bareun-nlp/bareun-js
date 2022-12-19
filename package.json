@@ -1,6 +1,6 @@
 {
-  "name": "baikalnlp",
-  "version": "1.0.2",
+  "name": "bareun",
+  "version": "1.0.3",
   "description": "Javascript client for bareun",
   "main": "src/index.js",
   "scripts": {
@@ -8,10 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/baikalai/baikalnlp-js.git"
+    "url": "git+https://github.com/bareun-nlp/bareun-js"
   },
   "keywords": [
-    "baikal",
+    "bareun",
     "nlp",
     "client",
     "tokenizer"
@@ -23,7 +23,7 @@
  },
   "license": "BSD 3-Clause",
   "bugs": {
-    "url": "https://github.com/baikalai/baikalnlp-js/issues"
+    "url": "https://github.com/bareun-nlp/bareun-js/issues"
   },
   "homepage": "https://bareun.ai",
   "devDependencies": {
