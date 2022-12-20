@@ -31,6 +31,12 @@ npm install bareun --save
 docker pull bareunai/bareun:latest
 ```
 
+
+## Envrionment values
+- BAREUN_HOST : Default address of NLP server ( default: "nlp.bareun.ai" )
+- BAREUN_PORT : Default port of NLP server ( default: 5656 )
+- you can set this ENV values in the .env file in your project root directory.
+
 ## classes 
 
 ### class LanguageServiceClient
@@ -39,7 +45,7 @@ docker pull bareunai/bareun:latest
 ###### Parameters:
 | Name | Type | Description |
 |---|:---:|:---:| 
-| remote | String | host + ":" + port. ex)"nlp.bareun.ai:5656" |
+| remote | String | host + ":" + port. ex)"nlp.bareun.ai:5656". |
 
 ##### AnalyzeSyntax( text, domain = null, auto_split = false, callback = null )
 Analyze text.
@@ -68,8 +74,8 @@ Object&lt;AnalyzeSyntaxResponse&gt; AnalyzeSyntaxResponse object.
 ###### Parameters:
 | Name | Type | Description |
 |---|:---:|:---:|
-| host | String | NLP server address. |
-| port | Integer | NLP server port. |
+| host | String | NLP server address. default: ENV BAREUN_HOST or "nlp.bareun.ai" |
+| port | Integer | NLP server port. default: ENV BAREUN_PORT or 5656 |
 | domain | String | domain custom dictionary name. |
 
 ##### set_domain(domain)
