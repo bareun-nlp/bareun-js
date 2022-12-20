@@ -1,6 +1,6 @@
 {
   "name": "bareun",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Javascript client for bareun",
   "main": "src/index.js",
   "scripts": {

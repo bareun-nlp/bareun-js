@@ -33,8 +33,8 @@ docker pull bareunai/bareun:latest
 
 
 ## Envrionment values
-- BAREUN_HOST : Default address of NLP server ( default: "nlp.bareun.ai" )
-- BAREUN_PORT : Default port of NLP server ( default: 5656 )
+- BAREUN_HOST : Default address of bareun server ( default: "nlp.bareun.ai" )
+- BAREUN_PORT : Default port of bareun server ( default: 5656 )
 - you can set this ENV values in the .env file in your project root directory.
 
 ## classes 
@@ -74,8 +74,8 @@ Object&lt;AnalyzeSyntaxResponse&gt; AnalyzeSyntaxResponse object.
 ###### Parameters:
 | Name | Type | Description |
 |---|:---:|:---:|
-| host | String | NLP server address. default: ENV BAREUN_HOST or "nlp.bareun.ai" |
-| port | Integer | NLP server port. default: ENV BAREUN_PORT or 5656 |
+| host | String | bareun server address. default: ENV BAREUN_HOST or "nlp.bareun.ai" |
+| port | Integer | bareun server port. default: ENV BAREUN_PORT or 5656 |
 | domain | String | domain custom dictionary name. |
 
 ##### set_domain(domain)
