@@ -43,18 +43,20 @@ docker pull bareunai/bareun:latest
 Analyze text.
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|---:|
+|---|:---:|:---|
 | text | String | | 
 | domain | String | domain custom dictionary name. |
-| auto split | Boolean | |
+| auto_split | Boolean | |
 | callback | Function(error, response) | |
 
 #### <async> asyncAnalyzeSyntax(text, domain = null, auto_split = false )
 Analyze text.
-###### Parameters<Boolean>.:
-- text : String 
-- domain : String domain custom dict name.
-- auto split : <Boolean>.
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---|
+| text | String | | 
+| domain | String | domain custom dictionary name. |
+| auto_split | Boolean | |
 
 
 ### class Tagger
@@ -62,7 +64,7 @@ Analyze text.
 ##### constructor(host="nlp.baikal.ai", port=5656, domain=null)
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|---:|
+|---|:---:|:---|
 | host | String | NLP server address. |
 | port | Integer | NLP server port. |
 | domain | String | domain custom dictionary name. |
@@ -70,21 +72,30 @@ Analyze text.
 ##### set_domain(domain)
 Set current domain custom dictionary name.
 ###### Parameters:
-- domain : String domain custom dictionary name.
+| Name | Type | Description |
+|---|:---:|:---|
+| domain | String | domain custom dictionary name. |
+
 
 ##### custom_dict(domain)
 Get custom dictionary 
 ###### Parameters:
-- domain : String domain custom dictionary name.
+| Name | Type | Description |
+|---|:---:|:---|
+| domain | String | domain custom dictionary name. |
 ###### Returns:
-Object<CustomDict>. Custom dictionary object.
+| Type | Description |
+|:---:|:---|
+| Object&lt;CustomDict&gt; | Custom dictionary object. |
 
 #### async tag(phrase, auto_split = false)
 ###### Parameters:
-- phrase : String 
-- auto_split : <Boolean>.
+| Name | Type | Description |
+|---|:---:|:---|
+| phrase | String | |
+| auto_split | Boolean |
 ###### Returns:
-Object<Tagged>. Tagged object.
+Object&lt;Tagged&gt; Tagged object.
 
 
 
