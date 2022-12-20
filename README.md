@@ -21,7 +21,7 @@ command line tools.
 npm install bareun --save
 ```
 
-## How to get bareun
+## How to get bareun server 
 - Go to https://bareun.ai/.
   - With registration, for the first time, you can get a free license for 3 months.
   - If you are a student or a researcher, you can get also a free license for 1 year,
