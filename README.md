@@ -36,35 +36,38 @@ docker pull bareunai/bareun:latest
 ### class LanguageServiceClient
 #### Methods
 ##### constructor(remote=null) 
-###### Parameters: 
-- remote : String host + ":" + port. ex)"nlp.baikal.ai:5656"
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:| 
+| remote | String | host + ":" + port. ex)"nlp.baikal.ai:5656" |
 
 ##### AnalyzeSyntax( text, domain = null, auto_split = false, callback = null )
 Analyze text.
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|:---|
+|---|:---:|:---:|
 | text | String | | 
 | domain | String | domain custom dictionary name. |
 | auto_split | Boolean | |
 | callback | Function(error, response) | |
 
-#### <async> asyncAnalyzeSyntax(text, domain = null, auto_split = false )
+##### async asyncAnalyzeSyntax(text, domain = null, auto_split = false )
 Analyze text.
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|:---|
+|---|:---:|:---:|
 | text | String | | 
 | domain | String | domain custom dictionary name. |
 | auto_split | Boolean | |
-
+###### Returns:
+Object&lt;AnalyzeSyntaxResponse&gt; AnalyzeSyntaxResponse object.
 
 ### class Tagger
 #### Methods
-##### constructor(host="nlp.baikal.ai", port=5656, domain=null)
+###### constructor(host="nlp.baikal.ai", port=5656, domain=null)
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|:---|
+|---|:---:|:---:|
 | host | String | NLP server address. |
 | port | Integer | NLP server port. |
 | domain | String | domain custom dictionary name. |
@@ -73,7 +76,7 @@ Analyze text.
 Set current domain custom dictionary name.
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|:---|
+|---|:---:|:---:|
 | domain | String | domain custom dictionary name. |
 
 
@@ -81,23 +84,111 @@ Set current domain custom dictionary name.
 Get custom dictionary 
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|:---|
+|---|:---:|:---:|
 | domain | String | domain custom dictionary name. |
 ###### Returns:
-| Type | Description |
-|:---:|:---|
-| Object&lt;CustomDict&gt; | Custom dictionary object. |
+Object&lt;CustomDict&gt; Custom dictionary object.
 
-#### async tag(phrase, auto_split = false)
+##### async tag(phrase, auto_split = false)
 ###### Parameters:
 | Name | Type | Description |
-|---|:---:|:---|
+|---|:---:|:---:|
 | phrase | String | |
 | auto_split | Boolean |
 ###### Returns:
 Object&lt;Tagged&gt; Tagged object.
 
+##### async pos(phrase, flatten = true, join=false, detail=false)
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| phrase | String | |
+| flatten | Boolean | |
+| join | Boolean | |
+| detail | Boolean | |
+###### Returns:
+Array&lt;Any&gt; 
 
+##### async morphs(phrase) 
+Get morphs array of phrase.
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| phrase | String | |
+###### Returns:
+Array&lt;String&gt; String array.
+
+##### async nouns(phrase) 
+Get nouns array of phrase.
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| phrase | String | |
+###### Returns:
+Array&lt;String&gt; String array.
+
+##### async verbs(phrase) 
+Get verbs array of phrase.
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| phrase | String | |
+###### Returns:
+Array&lt;String&gt; String array.
+
+
+### class Tagged
+#### Methods
+##### constructor(phrase, res)
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| phrase | String | |
+| res | Object&lt;AnalyzeSyntaxResponse&gt; | AnalyzeSyntaxResponse object |
+
+##### msg()
+Get AnalyzeSyntaxResponse object
+###### Returns:
+Object&lt;AnalyzeSyntaxResponse&gt; AnalyzeSyntaxResponse object.
+
+##### as_json_str(beauty  = false)
+Get json string for AnalyzeSyntaxResponse object
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| beauty | Boolean | |
+
+##### print_as_json(out = console) 
+Print json string for AnalyzeSyntaxResponse object
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| out | console, Object&lt;Stream&gt; | |
+
+##### pos(phrase, flatten = true, join=false, detail=false)
+###### Parameters:
+| Name | Type | Description |
+|---|:---:|:---:|
+| flatten | Boolean | |
+| join | Boolean | |
+| detail | Boolean | |
+###### Returns:
+Array&lt;Any&gt; 
+
+##### morphs() 
+Get morphs array of phrase.
+###### Returns:
+Array&lt;String&gt; String array.
+
+##### nouns() 
+Get nouns array of phrase.
+###### Returns:
+Array&lt;String&gt; String array.
+
+##### verbs( 
+Get verbs array of phrase.
+###### Returns:
+Array&lt;String&gt; String array.
 
 
 ## How to use
