@@ -21,7 +21,7 @@ const PROTO_PACKAGE = "bareun";
 
 module.exports = {
     default : {
-        nlp_host : process.env.BAREUN_HOST || "nlp.baikal.ai",
+        nlp_host : process.env.BAREUN_HOST || "nlp.bareun.ai",
         nlp_port : process.env.BAREUN_PORT || 5656
     },
     ROOT_PATH : ROOT_PATH,

@@ -39,7 +39,7 @@ docker pull bareunai/bareun:latest
 ###### Parameters:
 | Name | Type | Description |
 |---|:---:|:---:| 
-| remote | String | host + ":" + port. ex)"nlp.baikal.ai:5656" |
+| remote | String | host + ":" + port. ex)"nlp.bareun.ai:5656" |
 
 ##### AnalyzeSyntax( text, domain = null, auto_split = false, callback = null )
 Analyze text.
@@ -64,7 +64,7 @@ Object&lt;AnalyzeSyntaxResponse&gt; AnalyzeSyntaxResponse object.
 
 ### class Tagger
 #### Methods
-###### constructor(host="nlp.baikal.ai", port=5656, domain=null)
+###### constructor(host="nlp.bareun.ai", port=5656, domain=null)
 ###### Parameters:
 | Name | Type | Description |
 |---|:---:|:---:|
@@ -185,7 +185,7 @@ Get nouns array of phrase.
 ###### Returns:
 Array&lt;String&gt; String array.
 
-##### verbs( 
+##### verbs()
 Get verbs array of phrase.
 ###### Returns:
 Array&lt;String&gt; String array.
@@ -193,9 +193,9 @@ Array&lt;String&gt; String array.
 
 ## How to use
 ```
-    let host="gpu2.baikal.ai"
+    let host="gpu2.bareun.ai"
     let {LanguageServiceClient, Tagger, CustomDict}  = require("bareun");
-    let language_service_client = new BaikalLanguageServiceClient(host);
+    let language_service_client = new LanguageServiceClient(host);
 
     language_service_client.AnalyzeSyntax("아버지가 방에 들어가신다.",
         (error, res) => {
