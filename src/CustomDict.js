@@ -14,7 +14,7 @@ class CustomDict {
     client;
     word_sets = {};
 
-    constructor(domain, host=conf.default.nlp_host, port=conf.default.nlp_port) {
+    constructor(domain, host=conf.default.nlp_host, port=conf.default.nlp_port, api_key="") {
         this.opts = {domain:domain};
         if( host instanceof CustomDictionaryServiceClient ) {
             this.client = host;
@@ -32,7 +32,7 @@ class CustomDict {
                 this.opts.host = host;
                 this.opts.port = port;
             }
-            this.client = new CustomDictionaryServiceClient(this.opts.host + ":" + this.opts.port);
+            this.client = new CustomDictionaryServiceClient(this.opts.host + ":" + this.opts.port, api_key);
         }
     }
 

@@ -2,9 +2,9 @@
 const SRC_DIR="../src/";
 
 let LanguageServiceClient = require(SRC_DIR+"LanguageServiceClient.js");
-let language_service_client = new LanguageServiceClient();
+let language_service_client = new LanguageServiceClient("nlp.bareun.ai","koba-99CAAKC-UPDS66A-QR9QPVF-0AYPOCA");
 const conf = require(SRC_DIR+"config.js");
-jest.setTimeout(30000);
+// jest.setTimeout(30000);
 console.log(">>>>>>> "+ language_service_client.remote + " test start.");
 
 test("callback request for LanguageServiceClient", 

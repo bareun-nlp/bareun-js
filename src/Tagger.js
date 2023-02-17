@@ -98,8 +98,9 @@ class Tagger {
     opts;
     client;
     dict_client = null;
+    api_key;
     custom_dicts = {};
-    constructor(host=conf.default.nlp_host, port=conf.default.nlp_port, domain=null) {
+    constructor(host=conf.default.nlp_host, port=conf.default.nlp_port, domain=null, api_key="") {
         if( typeof host === "string" || host instanceof String ) {
             this.opts = {};
             if( host.indexOf(":") >= 0 ) {
@@ -115,8 +116,8 @@ class Tagger {
         } else {
             this.opts = host;
         }
-        this.client = new LanguageServiceClient(this.opts.host + ":" + this.opts.port);
-
+        this.api_key = api_key
+        this.client = new LanguageServiceClient(this.opts.host + ":" + this.opts.port, api_key);
     }
 
     set_domain(domain) {
@@ -126,7 +127,7 @@ class Tagger {
 
     getDictClient() {
         if( !this.dict_client ) 
-            this.dict_client = new CustomDictionaryServiceClient(this.opts.host + ":" + this.opts.port);
+            this.dict_client = new CustomDictionaryServiceClient(this.opts.host + ":" + this.opts.port, this.api_key);
         
         return this.dict_client;
     }
@@ -139,7 +140,7 @@ class Tagger {
             (this.custom_dicts[domain] = new CustomDict(domain, this.getDictClient())); 
     }
 
-    async tag(phrase, auto_split = false) {
+    async tag(phrase, auto_split = true) {
         if( !phrase )
             return new Tagged( "", LanguageServiceClient.emptyAnalyzeSyntaxResponse());        
         
