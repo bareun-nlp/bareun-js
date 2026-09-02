@@ -1,0 +1,9 @@
+# proto 원본은 바른 서버 저장소의 protos/bareun/*.proto 다.
+# 이 디렉토리의 사본을 갱신할 때는 서버 쪽에서 통째로 복사한다.
+version: v2
+modules:
+  - path: proto
+lint:
+  use: [STANDARD]
+breaking:
+  use: [FILE]

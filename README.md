@@ -1,280 +1,218 @@
-# bareun 
+# bareun-js
 
-# What is this?
+바른(bareun) 한국어 형태소 분석·맞춤법 교정 서버의 TypeScript 클라이언트입니다.
 
-`bareun` is the javascript library for bareun.
+바른에 대해서는 [bareun.ai](https://bareun.ai) 를 보세요.
 
-Bareun is a Korean NLP,
-which provides tokenizing, POS tagging for Korean.
+## 설치
 
-
-## Installation
-
-This is a [Node.js](https://nodejs.org/) module available through the 
-[npm registry](https://www.npmjs.com/). It can be installed using the 
-[`npm`](https://docs.npmjs.com/getting-started/installing-npm-packages-locally)
-or 
-[`yarn`](https://yarnpkg.com/en/)
-command line tools.
-
-```sh
-npm install bareun --save
+```
+npm install bareun
 ```
 
-## How to get bareun server 
-- Go to https://bareun.ai/.
-  - With registration, for the first time, you can get a free license for 3 months.
-  - If you are a student or a researcher, you can get also a free license for 1 year,
-    which is able to renew after 1 year.
-- Or use docker image.
-```shell
+Node 18 이상, 그리고 브라우저에서 동작합니다. 타입 정의가 함께 들어 있습니다.
+
+## 서버 준비
+
+1. [bareun.ai](https://bareun.ai) 에서 API 키를 발급받습니다.
+2. 서버를 실행합니다. [설치 안내](https://docs.bareun.ai/install/overview/)
+
+```
 docker pull bareunai/bareun:latest
 ```
 
+교정과 사전 검색은 맞춤법 교정(rev) 빌드의 서버에서만 동작합니다.
 
-## Envrionment values
-- BAREUN_HOST : Default address of bareun server ( default: "nlp.bareun.ai" )
-- BAREUN_PORT : Default port of bareun server ( default: 5656 )
-- you can set this ENV values in the .env file in your project root directory.
+## 형태소 분석
 
-## classes 
+```ts
+import { createBareunClient, Tagger } from "bareun";
 
-### class LanguageServiceClient
-#### Methods
-##### constructor(remote=null) 
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:| 
-| remote | String | host + ":" + port. ex)"nlp.bareun.ai:5656". |
+const client = createBareunClient({
+  apiKey: "koba-...",
+  host: "localhost",
+  port: 5656,
+});
 
-##### AnalyzeSyntax( text, domain = null, auto_split = false, callback = null )
-Analyze text.
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| text | String | | 
-| domain | String | domain custom dictionary name. |
-| auto_split | Boolean | |
-| callback | Function(error, response) | |
+const t = await new Tagger(client).tag("아버지가 방에 들어가신다.");
 
-##### async asyncAnalyzeSyntax(text, domain = null, auto_split = false )
-Analyze text.
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| text | String | | 
-| domain | String | domain custom dictionary name. |
-| auto_split | Boolean | |
-###### Returns:
-Object&lt;AnalyzeSyntaxResponse&gt; AnalyzeSyntaxResponse object.
-
-### class Tagger
-#### Methods
-###### constructor(host="nlp.bareun.ai", port=5656, domain=null)
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| host | String | bareun server address. default: ENV BAREUN_HOST or "nlp.bareun.ai" |
-| port | Integer | bareun server port. default: ENV BAREUN_PORT or 5656 |
-| domain | String | domain custom dictionary name. |
-
-##### set_domain(domain)
-Set current domain custom dictionary name.
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| domain | String | domain custom dictionary name. |
-
-
-##### custom_dict(domain)
-Get custom dictionary 
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| domain | String | domain custom dictionary name. |
-###### Returns:
-Object&lt;CustomDict&gt; Custom dictionary object.
-
-##### async tag(phrase, auto_split = false)
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| phrase | String | |
-| auto_split | Boolean |
-###### Returns:
-Object&lt;Tagged&gt; Tagged object.
-
-##### async pos(phrase, flatten = true, join=false, detail=false)
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| phrase | String | |
-| flatten | Boolean | |
-| join | Boolean | |
-| detail | Boolean | |
-###### Returns:
-Array&lt;Any&gt; 
-
-##### async morphs(phrase) 
-Get morphs array of phrase.
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| phrase | String | |
-###### Returns:
-Array&lt;String&gt; String array.
-
-##### async nouns(phrase) 
-Get nouns array of phrase.
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| phrase | String | |
-###### Returns:
-Array&lt;String&gt; String array.
-
-##### async verbs(phrase) 
-Get verbs array of phrase.
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| phrase | String | |
-###### Returns:
-Array&lt;String&gt; String array.
-
-
-### class Tagged
-#### Methods
-##### constructor(phrase, res)
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| phrase | String | |
-| res | Object&lt;AnalyzeSyntaxResponse&gt; | AnalyzeSyntaxResponse object |
-
-##### msg()
-Get AnalyzeSyntaxResponse object
-###### Returns:
-Object&lt;AnalyzeSyntaxResponse&gt; AnalyzeSyntaxResponse object.
-
-##### as_json_str(beauty  = false)
-Get json string for AnalyzeSyntaxResponse object
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| beauty | Boolean | |
-
-##### print_as_json(out = console) 
-Print json string for AnalyzeSyntaxResponse object
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| out | console, Object&lt;Stream&gt; | |
-
-##### pos(phrase, flatten = true, join=false, detail=false)
-###### Parameters:
-| Name | Type | Description |
-|---|:---:|:---:|
-| flatten | Boolean | |
-| join | Boolean | |
-| detail | Boolean | |
-###### Returns:
-Array&lt;Any&gt; 
-
-##### morphs() 
-Get morphs array of phrase.
-###### Returns:
-Array&lt;String&gt; String array.
-
-##### nouns() 
-Get nouns array of phrase.
-###### Returns:
-Array&lt;String&gt; String array.
-
-##### verbs()
-Get verbs array of phrase.
-###### Returns:
-Array&lt;String&gt; String array.
-
-
-## How to use
-```
-    let host="nlp.bareun.ai"
-    let {LanguageServiceClient, Tagger, CustomDict}  = require("bareun");
-    let language_service_client = new LanguageServiceClient(host);
-
-    language_service_client.AnalyzeSyntax("아버지가 방에 들어가신다.",
-        (error, res) => {
-            console.log('result : language_service_client.AnalyzeSyntax("아버지가 방에 들어가신다.")');
-            if( error ) {            
-                throw error;            
-                return;
-            }                 
-            console.log(JSON.stringify(res));        
-        }
-    );
-
-    (async () => {
-      try {  
-          let res = await language_service_client.asyncAnalyzeSyntax("아버지가 방에 들어가신다.")        
-          console.log(JSON.stringify(res));    
-      } catch(e) {
-          console.log(e);       
-      } 
-    })();
-
-    
-    let tagged = await tagger.tag("미친 세상에서 맨정신으로 산다는 건 힘든 일이다.");
-    (async () => {
-        const t=true, f=false;
-        let obj;
-        obj = tagged.pos(t, t, t);
-        console.log("pos(t, t, t)"+JSON.stringify(obj));
-        
-        obj = tagged.pos(t, t, f);
-        console.log("pos(t, t, f)"+JSON.stringify(obj));
-
-        obj = tagged.pos(t, f, t);
-        console.log("pos(t, f, t)"+JSON.stringify(obj));
-
-        obj = tagged.pos(f, t, t);
-        console.log("pos(f, t, t)"+JSON.stringify(obj));
-
-        obj = tagged.morphs();
-        console.log("morphs()"+JSON.stringify(obj));
-
-        obj = tagged.nouns();
-        console.log("nouns()"+JSON.stringify(obj));
-
-        obj = tagged.verbs();
-        console.log("verbs()"+JSON.stringify(obj));
-    })(); 
-
-
-    let dict = new CustomDict("game", host);
-
-    (async () => {
-        let set = new Set(["지지", "캐리", "던전", "현피", "세계관", "만렙","어그로","치트키","퀘스트","본캐","로밍","방사","딜러","버스","사플" ] );
-        dict.copy_cp_set(set);
-
-        let success = await dict.update();
-        console.log("result :  dict.update() - " + success);
-        
-        await dict.read_np_set_from_file(__dirname + "/game_dict.txt");
-        console.log("result :  dict.load() - " + JSON.stringify([...dict.word_sets.np_set]));   
-        let success = await dict.update();
-        console.log("result :  dict.update() - " + success);     
-
-        let res = await dict.client.async_get_list();
-        console.log("async_get_list() : " + JSON.stringify(res, null, 2));
-
-        await dict.load();
-
-        let res = await dict.clear();
-        console.log("clear() : " + JSON.stringify(res, null, 2));
-    })();
+t.pos();     // ["아버지/NNG", "가/JKS", "방/NNG", "에/JKB", "들어가/VV", "시/EP", "ㄴ다/EF", "./SF"]
+t.morphs();  // ["아버지", "가", "방", "에", "들어가", "시", "ㄴ다", "."]
+t.nouns();   // ["아버지", "방"]
+t.verbs();   // ["들어가"]
 ```
 
-## License
+공개 서비스에 붙을 때는 주소를 통째로 줍니다.
 
-BSD 3-Clause License
+```ts
+createBareunClient({ apiKey: "koba-...", baseUrl: "https://api.bareun.ai" });
+```
+
+### 브라우저에서
+
+서버가 CORS 를 직접 처리하므로 프록시 없이 부를 수 있습니다. 다만 API 키가 번들에
+들어가므로, 공개 페이지라면 서버를 하나 두고 그쪽에서 부르세요.
+
+### 위치 정보
+
+요청은 UTF-16 오프셋으로 보냅니다. 자바스크립트 문자열이 UTF-16 이라, 서버가 준
+위치를 `slice` 에 그대로 넣을 수 있습니다.
+
+```ts
+const span = t.response.sentences[0].tokens[0].text;
+text.slice(span.beginOffset, span.beginOffset + span.length);  // "아버지가"
+```
+
+### 사용자 사전
+
+```ts
+const tagger = new Tagger(client, ["mydict"]);
+```
+
+사전은 `client.customDictionary` 로 만들고 지웁니다. 여럿을 주면 앞에 온 것이 우선합니다.
+
+## 동형이의어 의미 구분 (WSD)
+
+같은 글자가 여러 뜻을 가질 때 어느 뜻인지 골라 줍니다. 서버에 WSD 모델이 실려
+있어야 하고, 추론이 한 번 더 돌아 느려집니다.
+
+```ts
+const t = await tagger.tag("나는 밤에 밤을 먹었다.", { withSense: true });
+for (const s of t.senses()) {
+  console.log(`${s.morph}/${s.tag} ${s.senseNo} ${s.meaning}`);
+}
+// 밤/NNG 2 밤나무의 열매. ...
+// 먹/VV 2 음식 따위를 입을 통하여 뱃속에 들여보내다.
+```
+
+조사·어미처럼 의미를 갖지 않는 형태소에는 원래 붙지 않으므로, 대부분의 형태소는
+결과에 나오지 않습니다.
+
+## 맞춤법 교정
+
+```ts
+import { Corrector } from "bareun";
+
+const c = new Corrector(client);
+
+await c.correct("이거 안되요. 학교에 갔읍니다.");
+// "이거 안되요. 학교에 갔습니다."
+
+for (const ch of await c.changes("이거 안되요. 학교에 갔읍니다.")) {
+  console.log(`${ch.origin} → ${ch.revised} (${ch.category})`);
+}
+// 갔읍니다. → 갔습니다. (STANDARD)
+```
+
+중첩 교정이나 도움말까지 보려면 `c.raw(text)` 로 서버 응답을 그대로 받습니다.
+
+## 우리말샘 사전 자소 검색
+
+완성형 한글로는 "초성이 ㅅ 이고 종성이 ㄴ 인 음절" 같은 조건을 쓸 수 없습니다.
+자소 슬롯 패턴으로 찾습니다.
+
+```ts
+import { DictSearchAnchor } from "bareun";
+
+const res = await client.dictSearch.searchDict({
+  pattern: "{ㅅ//ㄴ}다",
+  pos: ["동사"],
+});
+res.entries.map((e) => e.word);  // ["신다"]
+
+const suffix = await client.dictSearch.searchDict({
+  pattern: "아지",
+  anchor: DictSearchAnchor.SUFFIX,
+  limit: 5,
+});
+suffix.entries.map((e) => e.word);  // ["아지", "가아지", "강아지", "개아지", "갱아지"]
+```
+
+| 표기 | 뜻 |
+| --- | --- |
+| `다` | 그 음절 그대로 |
+| `{초/중/종}` | 한 음절의 자소 조건. 비우거나 `.` 이면 아무거나 |
+| `-` (종성 자리) | 받침 없음 |
+| `+` (종성 자리) | 받침 있음 |
+| `*` | 음절 0개 이상 |
+| `?` | 음절 정확히 1개 |
+
+## 오류 처리
+
+`ConnectError` 가 올라오고, 종류는 `Code` 로 가릅니다.
+
+```ts
+import { Code, isBareunError, describeError } from "bareun";
+
+try {
+  await tagger.tag("문장");
+} catch (e) {
+  if (isBareunError(e)) {
+    if (e.code === Code.PermissionDenied) console.error("API 키를 확인하세요");
+    else console.error(describeError(e));
+  }
+}
+```
+
+| 코드 | 언제 |
+| --- | --- |
+| `Unavailable` | 서버에 닿지 못함 (주소 오타·미기동·CORS) |
+| `PermissionDenied` | API 키가 유효하지 않거나 라이선스 만료 |
+| `Unimplemented` | 그 서버가 제공하지 않는 서비스 (교정 빌드가 아님) |
+| `ResourceExhausted` | 사용량 한도 초과 |
+
+`describeError(e)` 는 무엇을 확인해야 하는지를 붙인 한국어 문장을 돌려줍니다.
+
+## 감싸지 않은 API
+
+`client.language`·`client.revision`·`client.dictSearch`·`client.customDictionary` 는
+proto 의 모든 메서드를 그대로 노출합니다. 요청·응답 타입도 함께 내보내므로 직접
+만들어 쓸 수 있습니다.
+
+```ts
+import { EncodingType } from "bareun";
+
+await client.language.analyzeSyntaxRaw({
+  document: { content: "문장", language: "ko_KR" },
+  encodingType: EncodingType.UTF16,
+});
+```
+
+Node 에서 HTTP/2 를 쓰고 싶으면 전송 계층을 직접 넘깁니다.
+
+```ts
+import { createConnectTransport } from "@connectrpc/connect-node";
+
+createBareunClient({ apiKey: "koba-...", transport: createConnectTransport({ ... }) });
+```
+
+## 1.x 에서 옮겨오기
+
+호환되지 않습니다. 갈아타야 하는 부분은 아래와 같습니다.
+
+| 1.x | 2.0 |
+| --- | --- |
+| `@grpc/grpc-js` + 런타임에 `.proto` 파싱 | Connect + 생성된 타입 |
+| Node 전용 | Node 18+ 와 브라우저 |
+| 타입 없음 | TypeScript 로 작성, `.d.ts` 포함 |
+| CommonJS 만 | ESM·CJS 모두 |
+| 콜백·`Tagger` 클래스 | Promise, `createBareunClient` + `Tagger` |
+| 교정·WSD·사전 검색 없음 | 모두 지원 |
+
+## 개발
+
+```bash
+pnpm install
+pnpm generate      # proto → src/gen (buf)
+pnpm typecheck
+pnpm test          # 단위 테스트
+BAREUN_API_KEY=koba-... pnpm test   # 통합 테스트까지
+pnpm build
+```
+
+`proto/` 사본은 바른 서버 저장소의 `protos/bareun/*.proto` 에서 가져온 것입니다.
+서버 API 가 바뀌면 통째로 다시 복사하고 `pnpm generate` 를 돌립니다.
+
+## 라이선스
+
+BSD 3-Clause

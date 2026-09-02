@@ -1,0 +1,12 @@
+# protoc-gen-es v2 는 메시지뿐 아니라 서비스 서술자(GenService)도 함께 낸다.
+# connect-es v2 의 createClient 가 그 서술자를 그대로 받으므로,
+# 별도의 connect 플러그인이 필요 없다.
+version: v2
+inputs:
+  - directory: proto
+plugins:
+  - local: protoc-gen-es
+    out: src/gen
+    opt:
+      - target=ts
+      - import_extension=js
