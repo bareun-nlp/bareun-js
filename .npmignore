@@ -1,5 +1,8 @@
-.vscode
-node_modules
-.env
-__tests__
-*.tgz
+node_modules/
+dist/
+test/
+proto/
+*.config.ts
+tsconfig.json
+buf*.yaml
+.github/

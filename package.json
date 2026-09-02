@@ -1,38 +1,57 @@
 {
   "name": "bareun",
-  "version": "1.1.0",
-  "description": "Javascript client for bareun",
-  "main": "src/index.js",
+  "version": "2.0.0",
+  "description": "TypeScript/JavaScript client for bareun Korean NLP (Connect RPC)",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "proto", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "test": "jest"
+    "generate": "buf generate",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bareun-nlp/bareun-js"
+    "url": "git+https://github.com/bareun-nlp/bareun-js.git"
   },
-  "keywords": [
-    "bareun",
-    "nlp",
-    "client",
-    "tokenizer"
-  ],
-  "author":  {
-    "name": "Gihyun YUN",
-    "email": "gih2yun@baikal.ai", 
-    "homepage": "https://bareun.ai"
- },
-  "license": "BSD 3-Clause",
+  "keywords": ["bareun", "korean", "nlp", "tokenizer", "pos-tagger", "spell-checker", "connect-rpc"],
+  "author": {
+    "name": "BAIKAL AI Inc.",
+    "email": "contact@baikal.ai",
+    "url": "https://bareun.ai"
+  },
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/bareun-nlp/bareun-js/issues"
   },
   "homepage": "https://bareun.ai",
-  "devDependencies": {
-    "jest": "^29.3.1"
-  },
   "dependencies": {
-    "@grpc/grpc-js": "^1.8.0",
-    "@grpc/proto-loader": "^0.7.4",
-    "dotenv": "^16.0.3",
-    "google-proto-files": "^3.0.2"
+    "@bufbuild/protobuf": "^2.14.1",
+    "@connectrpc/connect": "^2.1.2",
+    "@connectrpc/connect-web": "^2.1.2"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.72.0",
+    "@bufbuild/protoc-gen-es": "^2.14.1",
+    "@types/node": "^22.10.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.11"
   }
 }
