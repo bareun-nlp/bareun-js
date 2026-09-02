@@ -213,6 +213,48 @@ pnpm build
 `proto/` 사본은 바른 서버 저장소의 `protos/bareun/*.proto` 에서 가져온 것입니다.
 서버 API 가 바뀌면 통째로 다시 복사하고 `pnpm generate` 를 돌립니다.
 
+## 배포
+
+태그를 밀면 GitHub Actions 가 npm 에 올립니다.
+
+```bash
+npm version 2.0.1        # package.json 갱신 + 커밋 + v2.0.1 태그
+git push && git push --tags
+```
+
+태그와 `package.json` 의 버전이 다르면 배포하지 않고 멈춥니다. 잘못 붙인 태그로
+엉뚱한 버전이 나가는 것을 막기 위해서입니다. npm 은 되돌리기가 사실상 불가능합니다
+(unpublish 는 24시간 안에만, 그마저도 조건이 붙습니다).
+
+Actions 탭에서 손으로 돌릴 수도 있습니다. 그때는 `dry_run` 을 켜서 무엇이
+올라가는지 먼저 확인하세요.
+
+### NPM_TOKEN 준비 (한 번만)
+
+워크플로가 쓰는 시크릿은 `NPM_TOKEN` 하나입니다. Automation 토큰이어야 합니다 —
+2FA 가 켜진 계정에서도 OTP 없이 배포되기 때문입니다.
+
+1. [npmjs.com](https://www.npmjs.com) 에 `bareun` 패키지를 관리하는 계정으로 로그인합니다.
+2. 오른쪽 위 아바타 → **Access Tokens** → **Generate New Token** → **Classic Token**
+3. 종류는 **Automation** 을 고릅니다.
+   - `Publish` 는 사람이 OTP 를 넣어야 해서 CI 에서 쓸 수 없습니다.
+   - `Read-only` 는 배포가 되지 않습니다.
+4. 만들어진 토큰을 복사합니다. **다시 볼 수 없습니다.**
+5. 이 저장소 → **Settings** → **Secrets and variables** → **Actions**
+   → **New repository secret**
+   - Name: `NPM_TOKEN`
+   - Secret: 복사한 토큰
+
+세분화된 접근 토큰(Granular Access Token)을 쓰려면 `bareun` 패키지에
+**Read and write** 권한을 주고, 만료일을 달력에 적어 두세요. 만료되면 배포가
+조용히 실패합니다.
+
+### provenance
+
+공개 저장소라 [npm provenance](https://docs.npmjs.com/generating-provenance-statements)
+를 붙입니다. 어느 저장소의 어느 커밋에서 만들어졌는지가 npm 페이지에 증명으로
+남습니다. 워크플로의 `id-token: write` 권한이 그것 때문에 필요합니다.
+
 ## 라이선스
 
 BSD 3-Clause
