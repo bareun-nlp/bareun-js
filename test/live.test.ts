@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
-import { createBareunClient } from "../src/client.js";
+import { createBareunClient, type BareunClient } from "../src/client.js";
 import { Corrector } from "../src/corrector.js";
 import { DictSearchAnchor } from "../src/gen/bareun/dict_search_service_pb.js";
 import { Tagger } from "../src/tagger.js";
@@ -17,10 +17,17 @@ import { Tagger } from "../src/tagger.js";
 const apiKey = process.env["BAREUN_API_KEY"];
 
 describe.skipIf(!apiKey)("살아 있는 서버", () => {
-  const client = createBareunClient({
-    apiKey: apiKey ?? "",
-    host: process.env["BAREUN_HOST"] ?? "localhost",
-    port: Number(process.env["BAREUN_PORT"] ?? 5656),
+  // skipIf 로 건너뛰는 스위트도 본문은 테스트 수집을 위해 실행된다. 그래서
+  // 클라이언트를 여기서 바로 만들면 키가 없는 환경(CI)에서 수집 단계가 죽는다.
+  // beforeAll 은 실제로 도는 스위트에서만 불리므로 거기서 만든다.
+  let client: BareunClient;
+
+  beforeAll(() => {
+    client = createBareunClient({
+      apiKey: apiKey ?? "",
+      host: process.env["BAREUN_HOST"] ?? "localhost",
+      port: Number(process.env["BAREUN_PORT"] ?? 5656),
+    });
   });
 
   it("형태소 분석", async () => {
