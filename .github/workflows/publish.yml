@@ -1,0 +1,75 @@
+# npm 에 배포한다.
+#
+# 태그를 밀면 돈다. 태그와 package.json 의 버전이 다르면 배포하지 않고 멈춘다 —
+# 잘못 붙인 태그로 엉뚱한 버전이 나가는 것을 막기 위해서다.
+#
+#     npm version 2.0.1        # package.json 갱신 + 커밋 + v2.0.1 태그
+#     git push && git push --tags
+#
+# 손으로 돌릴 수도 있다(Actions 탭 → publish → Run workflow).
+# 그때는 dry-run 으로 먼저 확인하는 것을 권한다.
+#
+# 필요한 준비물은 저장소 시크릿 NPM_TOKEN 하나다. 발급 방법은 README 의
+# "배포" 절을 보라.
+name: publish
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '실제로 올리지 않고 무엇이 올라가는지만 본다'
+        type: boolean
+        default: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # npm provenance(어느 저장소의 어느 커밋에서 나왔는지 증명)를 붙이려면 필요하다.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: pnpm install --frozen-lockfile
+
+      # src/gen 은 커밋하지 않는다. proto 에서 매번 만든다.
+      - run: pnpm generate
+
+      # 배포 전에 반드시 통과시킨다. 깨진 것을 올리면 되돌릴 수 없다
+      # (npm 은 24시간 안에만 unpublish 가 되고, 그마저도 조건이 붙는다).
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+      - name: 태그와 package.json 버전이 같은지 확인
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(node -p "require('./package.json').version")
+          echo "태그 $TAG / package.json $PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::태그($TAG)와 package.json($PKG)의 버전이 다릅니다. 배포를 멈춥니다."
+            exit 1
+          fi
+
+      - name: 무엇이 올라가는지 확인
+        run: npm publish --dry-run --access public
+
+      - name: npm 에 배포
+        if: ${{ github.event_name == 'push' || inputs.dry_run == false }}
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
