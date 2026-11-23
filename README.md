@@ -95,16 +95,50 @@ import { Corrector } from "bareun";
 
 const c = new Corrector(client);
 
-await c.correct("이거 안되요. 학교에 갔읍니다.");
-// "이거 안되요. 학교에 갔습니다."
+await c.correct("이거 안돼요. 학교에 갔읍니다.");
+// "이거 안돼요. 학교에 갔습니다."
 
-for (const ch of await c.changes("이거 안되요. 학교에 갔읍니다.")) {
+for (const ch of await c.changes("이거 안돼요. 학교에 갔읍니다.")) {
   console.log(`${ch.origin} → ${ch.revised} (${ch.category})`);
 }
 // 갔읍니다. → 갔습니다. (STANDARD)
 ```
 
 중첩 교정이나 도움말까지 보려면 `c.raw(text)` 로 서버 응답을 그대로 받습니다.
+
+## 긴 글 (잘림 안내)
+
+서버가 글 길이 기준을 켜 둔 경우(공개 API `api.bareun.ai` 는 9,000자), 기준을 넘는 글은
+거절하지 않고 **앞 5,000자 안팎만 처리**합니다. 9,000자까지는 전부 처리하고, 9,001자부터
+잘립니다. 잘린 응답에는 `truncation` 이 실리고, 기준 안의 글에는 붙지 않습니다.
+결과의 위치(`beginOffset`)는 어느 경우에나 원문 처음 기준입니다.
+
+```ts
+const t = await tagger.tag(longText);
+if (t.truncated) {
+  console.log(t.truncation);
+  // { originalChars: 9001, processedChars: 4991, droppedChars: 4010,
+  //   droppedBeginOffset: 4991, message: "요청 글이 너무 길어 ...", cutMidWord: false }
+  const rest = t.droppedText();  // 처리하지 않은 뒷부분. 따로 다시 보내면 된다.
+}
+
+const r = await new Corrector(client).correctDetailed(longText);
+r.revised;      // 앞부분의 교정 결과
+r.truncation;   // 잘리지 않았으면 undefined
+r.droppedText;  // 처리하지 않은 뒷부분(잘리지 않았으면 "")
+```
+
+| 필드 | 뜻 |
+| --- | --- |
+| `originalChars` | 요청 글 전체의 글자 수 |
+| `processedChars` | 처리한 글자 수 |
+| `droppedChars` | 버린 글자 수 |
+| `droppedBeginOffset` | 버린 구간의 시작 위치(UTF-16 기준이라 `text.slice(...)` 에 그대로 넣는다) |
+| `message` | 서버가 준 안내 문구 |
+| `cutMidWord` | 문장 끝·공백을 못 찾아 글자 중간에서 잘랐으면 true. 마지막 어절은 믿기 어렵다 |
+
+`Corrector.correct()` 는 교정문만 돌려주므로 잘렸는지 알 수 없습니다. 긴 글을 다룰 때는
+`correctDetailed()` 를 쓰세요. 서버가 이 필드를 모르던 시절의 서버에서는 항상 `undefined` 입니다.
 
 ## 우리말샘 사전 자소 검색
 

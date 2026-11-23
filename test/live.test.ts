@@ -53,9 +53,9 @@ describe.skipIf(!apiKey)("살아 있는 서버", () => {
 
   it("맞춤법 교정", async () => {
     const c = new Corrector(client);
-    expect(await c.correct("이거 안되요. 학교에 갔읍니다.")).toBe("이거 안되요. 학교에 갔습니다.");
+    expect(await c.correct("이거 안돼요. 학교에 갔읍니다.")).toBe("이거 안돼요. 학교에 갔습니다.");
 
-    const changes = await c.changes("이거 안되요. 학교에 갔읍니다.");
+    const changes = await c.changes("이거 안돼요. 학교에 갔읍니다.");
     expect(changes).toHaveLength(1);
     expect(changes[0]).toMatchObject({
       origin: "갔읍니다.",
@@ -91,5 +91,21 @@ describe.skipIf(!apiKey)("살아 있는 서버", () => {
       document: { content: "아버지가 방에 들어가신다.", language: "ko_KR" },
     });
     expect(res.sentences.length).toBeGreaterThan(0);
+  });
+  // 잘림은 서버가 기준(운영 9,000자 → 앞 5,000자)을 켜 둔 때만 일어난다.
+  // 기준이 꺼진 서버에서는 9,001자를 다 처리해 오래 걸리므로 켜 둔 환경에서만 돈다.
+  it.skipIf(!process.env["BAREUN_EXPECT_TRUNCATION"])("9,001자 요청은 앞부분만 처리하고 알린다", async () => {
+    const text = "오늘은 날씨가 맑아서 공원에 산책을 다녀왔다. ".repeat(1000).slice(0, 9001);
+    const t = await new Tagger(client).tag(text);
+    expect(t.truncated).toBe(true);
+    expect(t.truncation?.originalChars).toBe(9001);
+    expect(t.droppedText()).toBe(text.slice(t.truncation?.droppedBeginOffset));
+
+    const c = await new Corrector(client).correctDetailed(text);
+    expect(c.truncation?.droppedChars).toBeGreaterThan(0);
+    expect(c.droppedText.length).toBe(c.truncation?.droppedChars);
+
+    const short = await new Tagger(client).tag("아버지가 방에 들어가신다.");
+    expect(short.truncated).toBe(false);
   });
 });

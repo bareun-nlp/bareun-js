@@ -5,6 +5,7 @@ import {
   type AnalyzeSyntaxResponse,
   type Morpheme,
 } from "./gen/bareun/language_service_pb.js";
+import { toTruncationInfo, type TruncationInfo } from "./truncation.js";
 
 /**
  * 자바스크립트 문자열은 UTF-16 이다.
@@ -61,6 +62,29 @@ export class Tagged {
     readonly text: string,
     readonly response: AnalyzeSyntaxResponse,
   ) {}
+
+  /**
+   * 글이 서버 기준(운영 서버 9,000자)보다 길어 앞부분만 분석됐을 때의 정보.
+   * 잘리지 않았으면 undefined. 이때 분석 결과는 앞부분만의 것이다.
+   */
+  get truncation(): TruncationInfo | undefined {
+    return toTruncationInfo(this.response.truncation);
+  }
+
+  /** 글이 길어 앞부분만 분석됐으면 true. */
+  get truncated(): boolean {
+    return this.response.truncation !== undefined;
+  }
+
+  /**
+   * 분석하지 않고 버린 뒷부분의 원문. 잘리지 않았으면 빈 문자열.
+   *
+   * `droppedBeginOffset` 이 UTF-16 기준이라 `slice` 로 바로 자른다.
+   */
+  droppedText(): string {
+    const t = this.response.truncation;
+    return t ? this.text.slice(t.droppedBeginOffset) : "";
+  }
 
   /** 분석된 문장이 하나도 없으면 true. 빈 입력에서도 호출은 성공한다. */
   get isEmpty(): boolean {
