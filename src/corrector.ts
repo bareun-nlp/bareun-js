@@ -8,6 +8,7 @@ import {
   type CorrectErrorResponse,
 } from "./gen/bareun/revision_service_pb.js";
 import { doc } from "./tagger.js";
+import { toTruncationInfo, type TruncationInfo } from "./truncation.js";
 
 /** 교정 하나. */
 export interface Change {
@@ -25,6 +26,16 @@ export interface Change {
   beginOffset: number;
   /** 원문 조각의 길이 */
   length: number;
+}
+
+/** {@link Corrector.correctDetailed} 의 결과. */
+export interface Corrected {
+  /** 교정된 문장. 글이 잘렸으면 앞부분만의 교정 결과다. */
+  revised: string;
+  /** 글이 서버 기준(운영 서버 9,000자)보다 길어 앞부분만 처리됐을 때의 정보. 아니면 undefined. */
+  truncation?: TruncationInfo;
+  /** 처리하지 않고 버린 뒷부분의 원문. 잘리지 않았으면 빈 문자열. */
+  droppedText: string;
 }
 
 /** {@link Corrector} 호출 옵션. */
@@ -45,7 +56,7 @@ export interface CorrectOptions {
  *
  * ```ts
  * const c = new Corrector(client);
- * await c.correct("이거 안되요. 학교에 갔읍니다.");  // "이거 안되요. 학교에 갔습니다."
+ * await c.correct("이거 안돼요. 학교에 갔읍니다.");  // "이거 안돼요. 학교에 갔습니다."
  * ```
  *
  * 교정은 맞춤법 교정(rev) 빌드의 서버에서만 동작한다. 아닌 서버에 요청하면
@@ -70,6 +81,30 @@ export class Corrector {
    */
   async correct(text: string, options: CorrectOptions = {}): Promise<string> {
     return (await this.raw(text, options)).revised;
+  }
+
+  /**
+   * 교정된 문장과 함께, 글이 길어 잘렸는지도 받는다.
+   *
+   * 서버는 기준(운영 9,000자)을 넘는 글을 거절하지 않고 앞 5,000자 안팎만 교정한다.
+   * {@link Corrector.correct} 는 그 사실을 알려 주지 않으므로, 긴 글을 다룰 때는
+   * 이 메서드로 `truncation` 을 확인하고 `droppedText` 를 따로 처리한다.
+   *
+   * @param text 교정할 문장
+   * @param options 교정 옵션
+   * @returns 교정 결과와 잘림 정보
+   */
+  async correctDetailed(text: string, options: CorrectOptions = {}): Promise<Corrected> {
+    const res = await this.raw(text, options);
+    const truncation = toTruncationInfo(res.truncation);
+    const out: Corrected = {
+      revised: res.revised,
+      droppedText: truncation ? text.slice(truncation.droppedBeginOffset) : "",
+    };
+    if (truncation) {
+      out.truncation = truncation;
+    }
+    return out;
   }
 
   /**

@@ -17,7 +17,10 @@ export { Tagger, Tagged, tagName, doc, JS_ENCODING } from "./tagger.js";
 export type { SenseEntry, TagOptions } from "./tagger.js";
 
 export { Corrector } from "./corrector.js";
-export type { Change, CorrectOptions } from "./corrector.js";
+export type { Change, Corrected, CorrectOptions } from "./corrector.js";
+
+export { toTruncationInfo } from "./truncation.js";
+export type { TruncationInfo } from "./truncation.js";
 
 export { Code, ConnectError, isBareunError, describeError } from "./errors.js";
 
