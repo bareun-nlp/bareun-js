@@ -64,7 +64,7 @@ export class Tagged {
   ) {}
 
   /**
-   * 글이 서버 기준(운영 서버 9,000자)보다 길어 앞부분만 분석됐을 때의 정보.
+   * 글이 서버 기준(운영 서버 5,000자)보다 길어 앞부분만 분석됐을 때의 정보.
    * 잘리지 않았으면 undefined. 이때 분석 결과는 앞부분만의 것이다.
    */
   get truncation(): TruncationInfo | undefined {
