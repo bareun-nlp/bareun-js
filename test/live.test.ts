@@ -93,7 +93,7 @@ describe.skipIf(!apiKey)("살아 있는 서버", () => {
     });
     expect(res.sentences.length).toBeGreaterThan(0);
   });
-  // 잘림은 서버가 기준(운영 5,000자 → 앞 5,000자)을 켜 둔 때만 일어난다.
+  // 잘림은 서버가 기준을 켜 둔 때만 일어난다.
   // 기준이 꺼진 서버에서는 기준 넘는 글을 다 처리해 오래 걸리므로 켜 둔 환경에서만 돈다.
   it.skipIf(!process.env["BAREUN_EXPECT_TRUNCATION"])("기준을 넘는 9,001자 요청은 앞부분만 처리하고 알린다", async () => {
     const text = "오늘은 날씨가 맑아서 공원에 산책을 다녀왔다. ".repeat(1000).slice(0, 9001);
