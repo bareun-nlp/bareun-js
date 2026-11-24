@@ -108,10 +108,8 @@ for (const ch of await c.changes("이거 안돼요. 학교에 갔읍니다.")) {
 
 ## 긴 글 (잘림 안내)
 
-서버가 글 길이 기준을 켜 둔 경우(공개 API `api.bareun.ai` 는 9,000자), 기준을 넘는 글은
-거절하지 않고 **앞 5,000자 안팎만 처리**합니다. 9,000자까지는 전부 처리하고, 9,001자부터
-잘립니다. 잘린 응답에는 `truncation` 이 실리고, 기준 안의 글에는 붙지 않습니다.
-결과의 위치(`beginOffset`)는 어느 경우에나 원문 처음 기준입니다.
+바른 엔진 자체에는 글자 수 제약이 없지만, 클라우드 서비스(api.bareun.ai)는 용량 때문에 요청 한 번에 처리하는 양을 5,000자로 둡니다. 5,000자를 넘는 글은 앞부분만 처리하고 응답의 `truncation` 필드에 알리므로, 형태소 분석은 5,000자 이하로 나눠 보내세요. 이 기준은 운영 상황에 따라 바뀔 수 있으니 숫자를 코드에 박지 말고 `truncation` 의 `processedChars`·`droppedChars` 로 판단하세요. 설치형(자체 서버)은 기본으로 제한이 없고, 서버 설정으로 정할 수 있습니다.
+결과의 위치(`beginOffset`)는 잘렸을 때도 원문 처음 기준입니다. 맞춤법 교정은 아래 "긴 문서는 세션으로 나눠 보내기"를 보세요.
 
 ```ts
 const t = await tagger.tag(longText);
@@ -139,6 +137,43 @@ r.droppedText;  // 처리하지 않은 뒷부분(잘리지 않았으면 "")
 
 `Corrector.correct()` 는 교정문만 돌려주므로 잘렸는지 알 수 없습니다. 긴 글을 다룰 때는
 `correctDetailed()` 를 쓰세요. 서버가 이 필드를 모르던 시절의 서버에서는 항상 `undefined` 입니다.
+
+## 긴 문서는 세션으로 나눠 보내기
+
+바른 엔진 자체에는 글자 수 제약이 없지만, 클라우드 서비스(api.bareun.ai)는 용량 때문에 요청 한 번에 처리하는 양을 5,000자로 둡니다. 5,000자를 넘는 글은 앞부분만 처리하고 응답의 `truncation` 필드에 알리므로, 긴 글은 세션(`OpenSession`, `CloseSession`)을 열고 문단 단위로 5,000자 이하씩 보내 주세요(세션 안의 요청은 한 문서로 이어져 처리되고, 5,000자 기준은 각 요청에 똑같이 걸립니다). 이 기준은 운영 상황에 따라 바뀔 수 있으니 숫자를 코드에 박지 말고 `truncation` 의 `processedChars`·`droppedChars` 로 판단하세요.
+
+세션 안의 요청들은 따로 부르는 `CorrectError` 가 아니라 한 문서로 이어진 것으로 처리되어, 사용자 사전과 옵션이 문단마다 같게 적용되고 앞 문단에서 두 번 이상 나온 사전에 없는 낱말을 뒤 문단에서 오타로 보지 않습니다. 짧은 문단 요청은 서버가 한 번에 쓰는 메모리와 시간이 작아 긴 한 요청보다 안정되게 처리되며, 이는 서버 처리 부담에 관한 설명이고 요금이 달라진다는 뜻은 아닙니다. 세션은 맞춤법 교정에만 있고 형태소 분석에는 없습니다.
+
+사용자 사전과 교정기 옵션은 세션을 **열 때** 정하고, 이후 호출에서는 줄 수 없습니다(보내도 무시됩니다). 잘렸는지는 `correctDetailed()` 의 `truncation` 으로 확인하세요.
+
+```ts
+import { Corrector } from "bareun";
+
+const session = await new Corrector(client).openSession({ customDictNames: ["mydict"] });
+try {
+  const out: string[] = [];
+  for (const paragraph of paragraphs) {
+    out.push(await session.correct(paragraph));
+  }
+} finally {
+  await session.close();  // 안 닫아도 유휴 10분 뒤 닫히지만, 닫으면 동시 세션 상한을 바로 돌려받는다
+}
+```
+
+| 메서드 | 하는 일 |
+| --- | --- |
+| `session.correct(text)` | 교정문만 |
+| `session.correctDetailed(text)` | 교정문 + 잘림 정보 + 세션 개정 번호 |
+| `session.events(sinceRevision?)` | 세션이 새 단어를 확정한 사건 목록. 앞 호출의 답이 달라졌을 수 있는지 알아볼 때 |
+| `session.close()` | 세션을 닫음 |
+
+세션은 유휴 10분, 열린 지 1시간이 지나면 닫히고, API 키마다 동시에 열 수 있는 수에
+상한이 있습니다(넘으면 `ResourceExhausted`). 세션 문제는 `sessionErrorReason(e)` 로 가릅니다.
+
+| 이유 | 하면 되는 일 |
+| --- | --- |
+| `SESSION_NOT_FOUND`, `SESSION_EXPIRED` | 세션을 새로 열고 필요한 앞부분을 다시 보낸다 |
+| `SESSION_STORE_UNAVAILABLE` | 세션을 다시 열지 말고 잠시 뒤 다시 한다. 급하면 세션 없이 `correct()` 로 보낸다 |
 
 ## 우리말샘 사전 자소 검색
 
