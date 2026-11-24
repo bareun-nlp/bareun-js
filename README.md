@@ -140,6 +140,42 @@ r.droppedText;  // 처리하지 않은 뒷부분(잘리지 않았으면 "")
 `Corrector.correct()` 는 교정문만 돌려주므로 잘렸는지 알 수 없습니다. 긴 글을 다룰 때는
 `correctDetailed()` 를 쓰세요. 서버가 이 필드를 모르던 시절의 서버에서는 항상 `undefined` 입니다.
 
+## 긴 문서는 세션으로 나눠 보내기
+
+한 번에 보내기에 긴 문서는 세션을 열고 단락 단위로 이어서 보냅니다. 세션은 미등록 단어가
+두 번 이상 나와야 알려진 말로 확정하고 그 상태를 호출 사이에 이어 가므로, 앞에서 본
+단어가 뒤의 교정에 반영됩니다. 사용자 사전과 교정기 설정은 세션을 **열 때** 한 번 정하고,
+이후 호출에서는 줄 수 없습니다.
+
+```ts
+import { Corrector } from "bareun";
+
+const session = await new Corrector(client).openSession({ customDictNames: ["mydict"] });
+try {
+  const out: string[] = [];
+  for (const paragraph of paragraphs) {
+    out.push(await session.correct(paragraph));
+  }
+} finally {
+  await session.close();  // 안 닫아도 유휴 10분 뒤 닫히지만, 닫으면 동시 세션 상한을 바로 돌려받는다
+}
+```
+
+| 메서드 | 하는 일 |
+| --- | --- |
+| `session.correct(text)` | 교정문만 |
+| `session.correctDetailed(text)` | 교정문 + 잘림 정보 + 세션 개정 번호 |
+| `session.events(sinceRevision?)` | 세션이 새 단어를 확정한 사건 목록. 앞 호출의 답이 달라졌을 수 있는지 알아볼 때 |
+| `session.close()` | 세션을 닫음 |
+
+세션은 유휴 10분, 열린 지 1시간이 지나면 닫히고, API 키마다 동시에 열 수 있는 수에
+상한이 있습니다(넘으면 `ResourceExhausted`). 세션 문제는 `sessionErrorReason(e)` 로 가릅니다.
+
+| 이유 | 하면 되는 일 |
+| --- | --- |
+| `SESSION_NOT_FOUND`, `SESSION_EXPIRED` | 세션을 새로 열고 필요한 앞부분을 다시 보낸다 |
+| `SESSION_STORE_UNAVAILABLE` | 세션을 다시 열지 말고 잠시 뒤 다시 한다. 급하면 세션 없이 `correct()` 로 보낸다 |
+
 ## 우리말샘 사전 자소 검색
 
 완성형 한글로는 "초성이 ㅅ 이고 종성이 ㄴ 인 음절" 같은 조건을 쓸 수 없습니다.

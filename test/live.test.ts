@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { createBareunClient, type BareunClient } from "../src/client.js";
 import { Corrector } from "../src/corrector.js";
 import { DictSearchAnchor } from "../src/gen/bareun/dict_search_service_pb.js";
+import { sessionErrorReason } from "../src/session.js";
 import { Tagger } from "../src/tagger.js";
 
 /**
@@ -107,5 +108,21 @@ describe.skipIf(!apiKey)("살아 있는 서버", () => {
 
     const short = await new Tagger(client).tag("아버지가 방에 들어가신다.");
     expect(short.truncated).toBe(false);
+  });
+  it("세션을 열고 이어서 교정하고 닫는다", async () => {
+    const s = await new Corrector(client).openSession();
+    try {
+      expect(s.sessionId).not.toBe("");
+      expect(await s.correct("학교에 갔읍니다.")).toBe("학교에 갔습니다.");
+      expect(await s.correct("이어서 갔읍니다.")).toBe("이어서 갔습니다.");
+      const ev = await s.events();
+      expect(ev.revision).toBe(s.revision);
+    } finally {
+      await s.close();
+    }
+    // 닫힌 세션은 서버가 모른다.
+    await expect(s.correct("또 갔읍니다.")).rejects.toSatisfy(
+      (e) => sessionErrorReason(e) === "SESSION_NOT_FOUND",
+    );
   });
 });

@@ -7,6 +7,7 @@ import {
   RevisionConfigSchema,
   type CorrectErrorResponse,
 } from "./gen/bareun/revision_service_pb.js";
+import { CorrectionSession } from "./session.js";
 import { doc } from "./tagger.js";
 import { toTruncationInfo, type TruncationInfo } from "./truncation.js";
 
@@ -36,6 +37,25 @@ export interface Corrected {
   truncation?: TruncationInfo;
   /** 처리하지 않고 버린 뒷부분의 원문. 잘리지 않았으면 빈 문자열. */
   droppedText: string;
+}
+
+/**
+ * 교정 응답에서 교정문과 잘림 정보를 뽑는다.
+ *
+ * @param text 요청에 보낸 원문
+ * @param res 서버 응답
+ * @returns 교정문과 잘림 정보
+ */
+export function toCorrected(text: string, res: CorrectErrorResponse): Corrected {
+  const truncation = toTruncationInfo(res.truncation);
+  const out: Corrected = {
+    revised: res.revised,
+    droppedText: truncation ? text.slice(truncation.droppedBeginOffset) : "",
+  };
+  if (truncation) {
+    out.truncation = truncation;
+  }
+  return out;
 }
 
 /** {@link Corrector} 호출 옵션. */
@@ -95,16 +115,7 @@ export class Corrector {
    * @returns 교정 결과와 잘림 정보
    */
   async correctDetailed(text: string, options: CorrectOptions = {}): Promise<Corrected> {
-    const res = await this.raw(text, options);
-    const truncation = toTruncationInfo(res.truncation);
-    const out: Corrected = {
-      revised: res.revised,
-      droppedText: truncation ? text.slice(truncation.droppedBeginOffset) : "",
-    };
-    if (truncation) {
-      out.truncation = truncation;
-    }
-    return out;
+    return toCorrected(text, await this.raw(text, options));
   }
 
   /**
@@ -132,6 +143,23 @@ export class Corrector {
         length: b.origin?.length ?? 0,
       };
     });
+  }
+
+  /**
+   * 세션을 연다. 긴 문서를 작은 단위로 이어서 교정할 때 쓴다.
+   *
+   * 사용자 사전과 교정기 설정은 여기서 한 번 정해지고 세션이 닫힐 때까지 바뀌지
+   * 않는다. 이후 호출은 그 설정을 쓰므로 호출마다 `config` 를 줄 수 없다.
+   *
+   * @param options 사전·교정기 옵션. 사전은 생성자에 준 것이 기본값이다.
+   * @returns 열린 세션
+   */
+  async openSession(options: CorrectOptions = {}): Promise<CorrectionSession> {
+    const res = await this.client.revision.openSession({
+      customDictNames: options.customDictNames ?? this.customDictNames,
+      ...(options.config ? { config: options.config } : {}),
+    });
+    return new CorrectionSession(this.client, res);
   }
 
   /**
