@@ -22,6 +22,9 @@ export type { Change, Corrected, CorrectOptions } from "./corrector.js";
 export { toTruncationInfo } from "./truncation.js";
 export type { TruncationInfo } from "./truncation.js";
 
+export { CorrectionSession, sessionErrorReason } from "./session.js";
+export type { SessionCorrected, SessionErrorReason, SessionEvents } from "./session.js";
+
 export { Code, ConnectError, isBareunError, describeError } from "./errors.js";
 
 // 생성된 proto 타입을 그대로 내보낸다. 요청을 직접 만들거나 응답을 깊이
